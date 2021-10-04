@@ -40,8 +40,7 @@ This is a library of all expected endpoints and their behaviors.
 ### GET `/categories`
 - Fetches a dictionary of all categories with ids as the keys and type as the value.
 - Request Arguments: None
-- Returns a dictionary object with a key of 'categories' and with a dictionary object containing id: category pairs 
-  as the value.
+- Expected Return:
 ```js
 {'categories': {
         '1' : "Science",
@@ -55,8 +54,8 @@ This is a library of all expected endpoints and their behaviors.
   
 ### GET `/questions?page={integer}`
 - Fetches a paginated set of 10 questions, total number of questions, and all categories 
-- Request Arguments: None
-- Returns:
+- Request Arguments: page - integer 
+- Expected Return:
 ```js
 {
     "categories": {
@@ -81,8 +80,9 @@ This is a library of all expected endpoints and their behaviors.
 ```
 
 ### GET `/categories/{id}/questions`
-- Fetches all questions for a specific category
-- 
+- Fetches all questions for a specific category by a particular catgeory id
+- Request Arguments: id - integer
+- Expected Return:
 ```js
 {
     "current_category":{
@@ -100,10 +100,73 @@ This is a library of all expected endpoints and their behaviors.
 ```
 
 ### DELETE `/questions/{id}`
-- Deletes a specified question
+- Deletes a specified question by its specific question id.
+- Request Arguments: id - integer
+- Expected Return:
+```js
+{           
+    'success': True,       
+    'deleted': {id},
+}                        
+```                       
 
 ### POST `/quizes`
+- Send a post request in order to retrive a single question from a pool of unasked questions either in a specific 
+  category or from all categories.
+- Required body arguments: Previous questions as array of question ids and current category by category id. ID of 
+  zero equates to all categories. 
+- Example body:
+```js
+{'previous_questions': [1, 3, 6], 'quiz_category': [5]}
+```
+- Expected Return:
+```js
+{
+    'success': True, 
+    'question': {
+        'id': 1,
+        'question': 'This is a question',
+        'answer': 'This is an answer', 
+        'difficulty': 5,
+        'category': 5
+  }
+}
+```
 
 ### POST `/questions`
+- Adds a new question to the questons database table.
+- Request body example:
+```js
+{
+    'question':  'sample new question?',
+    'answer':  'sample new answer!',
+    'difficulty': 1,
+    'category': 3,
+}
+```
+- Expected Return:
+```js
+{                             
+    'success': True,                            
+    'new_question': {id},                
+    'total_questions': 14,
+}                                             
+```
 
 ### POST `/questions`
+- Searches and filters through all questions using a POST request and a search term argument.
+- Required Arguments: searchTerm - String
+- Expected Return:
+```js
+{
+    'success': True, 
+    'total_questions': 6,
+    'questions': [{
+        'question': 'sample new question?',
+        'answer': 'sample new answer!',
+        'difficulty': 1,
+        'category': 3,
+  }],
+    'current_category': None
+}
+```
