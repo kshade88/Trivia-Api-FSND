@@ -158,27 +158,31 @@ def create_app(test_config=None):
 
     @app.route('/quizzes', methods=['GET', 'POST'])
     def get_quiz_questions():
-        body = request.get_json()
-        previous_questions = body.get('previous_questions', [])
-        quiz_category = body.get('quiz_category', None)
+        try:
+            body = request.get_json()
+            previous_questions = body.get('previous_questions', [])
+            quiz_category = body.get('quiz_category', None)
 
-        if quiz_category:
-            if quiz_category['id'] == 0:
-                quiz = Question.query.all()
+            if quiz_category:
+                if quiz_category['id'] == 0:
+                    quiz = Question.query.all()
+                else:
+                    quiz = Question.query.filter_by(category=quiz_category['id']).all()
             else:
-                quiz = Question.query.filter_by(category=quiz_category['id']).all()
+                abort(422)
+            selected = []
+            for question in quiz:
+                if question.id not in previous_questions:
+                    selected.append(question.format())
 
-        selected = []
-        for question in quiz:
-            if question.id not in previous_questions:
-                selected.append(question.format())
-
-        if len(selected) != 0:
-            result = random.choice(selected)
-            return jsonify({
-                'success': True,
-                'question': result
-            })
+            if len(selected) != 0:
+                result = random.choice(selected)
+                return jsonify({
+                    'success': True,
+                    'question': result
+                })
+        except:
+            abort(422)
 
     '''
     All error handlers
