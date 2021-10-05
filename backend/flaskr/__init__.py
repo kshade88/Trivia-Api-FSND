@@ -1,6 +1,5 @@
 import os
 from flask import Flask, request, abort, jsonify
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
 
@@ -161,15 +160,14 @@ def create_app(test_config=None):
         try:
             body = request.get_json()
             previous_questions = body.get('previous_questions', [])
-            quiz_category = body.get('quiz_category', None)
+            quiz_category = body.get('quiz_category', 0)
 
             if quiz_category:
                 if quiz_category['id'] == 0:
                     quiz = Question.query.all()
                 else:
                     quiz = Question.query.filter_by(category=quiz_category['id']).all()
-            else:
-                abort(422)
+
             selected = []
             for question in quiz:
                 if question.id not in previous_questions:
@@ -177,12 +175,17 @@ def create_app(test_config=None):
 
             if len(selected) != 0:
                 result = random.choice(selected)
+                if result:
+                    return jsonify({
+                        'success': True,
+                        'question': result
+                    })
+            else:
                 return jsonify({
-                    'success': True,
-                    'question': result
+                   'question': None
                 })
         except:
-            abort(422)
+            abort(400)
 
     '''
     All error handlers

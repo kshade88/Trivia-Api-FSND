@@ -127,12 +127,12 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
 
-    def test_failed_post_quiz_question(self):
+    def test_422_invalid_quiz_category(self):
         res = self.client().post('/quizzes',
-                                 json={'previous_questions': [6, 5, 100], 'quiz_category': {"id": 1}})
+                                 json={'previous_questions': [6, 5], 'quiz_category': {"id": ''}})
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
 
 # Make the tests conveniently executable
