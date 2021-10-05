@@ -14,7 +14,7 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
+        self.database_name = 'trivia_test'
         self.database_path = "postgresql://{}/{}".format('localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
@@ -29,6 +29,13 @@ class TriviaTestCase(unittest.TestCase):
             'question': 'What is blue?',
             'answer': 'yes',
             'category': 1,
+            'difficulty': 1
+        }
+
+        self.new_invalid_question = {
+            'question': 'What is blue?',
+            'answer': 'yes',
+            'category': 100,
             'difficulty': 1
         }
     
@@ -86,6 +93,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertTrue(data['new_question'])
         self.assertTrue(data['total_questions'])
+
+    def test_422_create_new_question_invalid(self):
+        res = self.client().post('/questions', json=self.new_invalid_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
 
     def test_get_questions_by_category_id(self):
         res = self.client().get('/categories/1/questions')
